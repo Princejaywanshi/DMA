@@ -7,6 +7,7 @@ import useTheme from '../hooks/useTheme';
 import ActivityIndicator from '../assets/activityIndicator';
 import { SCREEN_HEIGHT, TOP_SPACE_ANDROID } from '../utils/dimensions';
 import ButtonWithPushBack from '../component/Button';
+import { useNavigation } from '@react-navigation/native';
 
 const CORRECT_OTP = '123456'; // Hardcoded OTP for validation
 
@@ -14,6 +15,7 @@ const OTPVerificationScreen = () => {
   const [otp, setOtp] = useState('');
   const [btnLoadingState, setBtnLoadingState] = useState(false);
   const { theme } = useTheme();
+  const navigation = useNavigation();
 
   const handleOTPChange = (enteredOtp) => {
     setOtp(enteredOtp);
@@ -56,7 +58,7 @@ const OTPVerificationScreen = () => {
       <PrimaryButton
   disabled={otp.length !== 6 || btnLoadingState}
   title="Verify email"
-  onPress={handleVerify}
+  onPress={()=>navigation.navigate("createProfile")}
   loading={btnLoadingState}
   loadingProps={<ActivityIndicator animating size="small" />}
   style={{ opacity: otp.length !== 6 || btnLoadingState ? 0.5 : 1 }} // Add opacity for visual feedback
@@ -73,7 +75,7 @@ const OTPVerificationScreen = () => {
       </View>
 
       <View style={styles.backToLogin}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={()=>navigation.navigate("Login")}>
           <Text h4 bold textAliments="center">Back to log in</Text>
         </TouchableOpacity>
       </View>

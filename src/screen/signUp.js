@@ -22,6 +22,7 @@ import ButtonWithPushBack from '../component/Button';
 import {color} from 'react-native-elements/dist/helpers';
 import PrimaryButton from '../component/prButton';
 import ActivityIndicator from '../assets/activityIndicator';
+import { useNavigation } from '@react-navigation/native';
 
 const SignUp = () => {
   const {theme} = useTheme();
@@ -35,6 +36,7 @@ const SignUp = () => {
   const [errors, setErrors] = useState({});
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [btnLoadingState, setBtnLoadingState] = useState(false);
+  const navigation = useNavigation();
   
 
   const validateInputs = () => {
@@ -225,7 +227,7 @@ const SignUp = () => {
       <PrimaryButton
         disabled={isButtonDisabled}
         title="Sign Up"
-        onPress={handleSignUp}
+        onPress={()=>navigation.navigate("OTPVerificationScreen")}
         loading={btnLoadingState}
         loadingProps={<ActivityIndicator animating size="small" />}
         style={isButtonDisabled ? {opacity: 0.5} : {}} // Add opacity for visual feedback
@@ -241,7 +243,7 @@ const SignUp = () => {
         }}>
         <Text h5 style={{color: theme.$surface}}>
           Already have an Account?{' '}
-          <TouchableOpacity onPress={() => console.log('Navigate to Login')}>
+          <TouchableOpacity onPress={() =>navigation.navigate("Login")}>
             <Text h5 style={{top: 8}}>
               Login
             </Text>

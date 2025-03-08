@@ -20,6 +20,7 @@ import TextInputEml from '../component/textInput';
 import { color } from 'react-native-elements/dist/helpers';
 import ButtonWithPushBack from '../component/Button';
 import PrimaryButton from '../component/prButton';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Login() {
   const {theme} = useTheme();
@@ -29,6 +30,7 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const [secureText, setSecureText] = useState(true);
   const [error, setError] = useState('');
+  const navigation = useNavigation();
 
   const validateEmailOrPhone = text => {
     setEmailOrPhone(text);
@@ -150,15 +152,15 @@ export default function Login() {
           <Button title="Login" onPress={handleLogin} />
           <ButtonWithPushBack customContainerStyle={{marginVertical:30}}>
             <PrimaryButton
-            title="Login" 
-            onPress={handleLogin} 
+            title="on" 
+            onPress={()=>navigation.navigate("OTPVerificationScreen")} 
             />
           </ButtonWithPushBack>
         </View>
         <View style={styles.signupLink}>
           <Text h5 semiBold style={{color:theme.$surface}}>
             Don't have an account?{' '}
-            <TouchableOpacity >
+            <TouchableOpacity onPress={()=>navigation.navigate("SignUp")}>
             <Text h5 semiBold  style={{top:7}}>Sign Up</Text>
             </TouchableOpacity>
           </Text>
