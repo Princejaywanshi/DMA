@@ -4,7 +4,9 @@ import { Text, View } from "react-native";
 import SignUp from "../../screen/signUp";
 import Login from "../../screen/Login";
 import OTPVerificationScreen from "../../screen/otpScreen";
-import createProfile from "../../screen/createProfile";
+import CreateProfile from "../../screen/createProfile";
+import BussinessProfile from "../../screen/BussinessProfile";
+
 
 const Stack = createNativeStackNavigator();
 
@@ -12,10 +14,11 @@ const Stack = createNativeStackNavigator();
 const AuthStack = () => {
     return (
         <Stack.Navigator screenOptions={({ headerShown: false })}>
+               <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="SignUp" component={SignUp} />
-            <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen name="OTPVerificationScreen" component={OTPVerificationScreen} />
-            <Stack.Screen name="createProfile" component={createProfile} />
+             <Stack.Screen name="OTPVerificationScreen" component={OTPVerificationScreen} /> 
+            <Stack.Screen name="createProfile" component={CreateProfile} />
+            <Stack.Screen name="BussinessProfile" component={BussinessProfile} />
         </Stack.Navigator>
     )
 }

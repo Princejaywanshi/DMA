@@ -23,6 +23,7 @@ import {color} from 'react-native-elements/dist/helpers';
 import PrimaryButton from '../component/prButton';
 import ActivityIndicator from '../assets/activityIndicator';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
 
 const SignUp = () => {
   const {theme} = useTheme();
@@ -37,6 +38,8 @@ const SignUp = () => {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [btnLoadingState, setBtnLoadingState] = useState(false);
   const navigation = useNavigation();
+  console.log(mobile)
+  console.log(password)
   
 
   const validateInputs = () => {
@@ -87,11 +90,50 @@ const SignUp = () => {
     validateInputs();
   }, [username, email, mobile, password]);
 
-  const handleSignUp = () => {
-    if (!isButtonDisabled) {
-      console.log('Sign-up successful!');
+  const handleSignUp = async () => {
+    if (isButtonDisabled) return;
+  
+    setBtnLoadingState(true); // Show loading indicator
+  
+    try {
+      const response = await axios.post('http://52.70.194.52/api/account/register/', {
+        user_type: selectedProfile.toLowerCase(), // 'personal' or 'business'
+        username: username,
+        email: email,
+        mobile_number: mobile,
+        password: password,
+      });
+  
+      console.log('Sign-up successful!', response);
+      alert('Account created successfully!');
+  
+      // ✅ Navigate only after successful signup & send all required 
+      console.log("Navigating with data:", {
+        user_type: selectedProfile.toLowerCase(),
+        email: email,
+        mobile_number: mobile,
+        username: username,
+        password:password
+      });
+      navigation.navigate("OTPVerificationScreen", { 
+        user_type: selectedProfile.toLowerCase(),
+        email: email,
+        mobile_number: mobile,
+        username: username,
+        password:password
+      });
+  
+    } catch (error) {
+      console.error('Sign-up failed:', error.response?.data || error.message);
+      alert(error.response?.data?.error || 'Registration failed. Please try again.');
+    } finally {
+      setBtnLoadingState(false); // Hide loading indicator
     }
   };
+  
+  
+
+  
 
   return (
     <SafeAreaView
@@ -123,8 +165,6 @@ const SignUp = () => {
         </Text>
         <Text style={styles.subtitle}>PROFILE</Text>
       </View>
-
-      {/* Profile Selection */}
       <View style={styles.profileSelector}>
         <TouchableOpacity
           style={[
@@ -147,7 +187,6 @@ const SignUp = () => {
       </View>
 
       <View style={{bottom: 30}}>
-        {/* Username Input */}
         <TextInputEml
           label="Username"
           placeholder="Enter your username"
@@ -160,8 +199,6 @@ const SignUp = () => {
             {errors.username}
           </Text>
         )}
-
-        {/* Email Input */}
         <TextInputEml
           label="Email"
           placeholder="Enter your email"
@@ -175,8 +212,6 @@ const SignUp = () => {
             {errors.email}
           </Text>
         )}
-
-        {/* Mobile Input */}
         <TextInputEml
           label="Mobile"
           placeholder="Enter your mobile no"
@@ -190,8 +225,6 @@ const SignUp = () => {
             {errors.mobile}
           </Text>
         )}
-
-        {/* Password Input */}
         <TextInputEml
           label="Password"
           placeholder="********"
@@ -207,8 +240,6 @@ const SignUp = () => {
             {errors.password}
           </Text>
         )}
-
-        {/* ✅ Checkbox Below Password */}
         <View style={styles.checkboxContainer}>
           <Checkbox
             checked={isChecked}
@@ -218,21 +249,15 @@ const SignUp = () => {
         </View>
       </View>
 
-      {/* <ButtonWithPushBack 
-            //     title="Sign Up" 
-            //     onPress={handleSignUp} 
-            //     customContainerStyle={isButtonDisabled ? { opacity: 0.5 } : {}}
-            //     disabled={isButtonDisabled} 
-            // /> */}
+
       <PrimaryButton
         disabled={isButtonDisabled}
         title="Sign Up"
-        onPress={()=>navigation.navigate("OTPVerificationScreen")}
+        onPress={handleSignUp}
         loading={btnLoadingState}
-        loadingProps={<ActivityIndicator animating size="small" />}
-        style={isButtonDisabled ? {opacity: 0.5} : {}} // Add opacity for visual feedback
+        loadingProps={<ActivityIndicator  />}
+        style={isButtonDisabled ? {opacity: 0.5} : {}}
       />
-      {/* </ButtonWithPushBack> */}
 
       <View
         style={{

@@ -7,6 +7,7 @@ import SignUp from './src/screen/signUp';
 import OTPVerificationScreen from './src/screen/otpScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import AuthStack from './src/navigation/AuthStack/authStack';
+import SettingsProvider from './src/utils/settingProvider';
 
 
 const App = () => {
@@ -14,15 +15,11 @@ const App = () => {
 
     <Provider store={store}>
       <NavigationContainer>
-
-
+        <SettingsProvider>
         <SafeAreaView style={{ flex: 1 }}>
-          {/* <Login /> */}
-          {/* <SignUp /> */}
-          {/* <OTPVerificationScreen/> */}
           <AuthStack/>
-
         </SafeAreaView>
+        </SettingsProvider>
       </NavigationContainer>
 
     </Provider>

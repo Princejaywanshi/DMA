@@ -14,6 +14,7 @@ const PrimaryButton = (props) => {
     loadingProps,
     customsBg,
     disabled,
+    icon,
     ...rest
   } = props;
 
@@ -36,6 +37,8 @@ const PrimaryButton = (props) => {
       disabledStyle={{ opacity: 0.5 }} // Reduce opacity for disabled mode
       disabledTitleStyle={{ color: textColor, opacity: 0.6 }}
       loadingProps={{ color: textColor, ...loadingProps }}
+      icon={icon} // Pass the icon prop
+      iconContainerStyle={styles.iconContainer}
     />
   );
 };
@@ -46,6 +49,7 @@ PrimaryButton.defaultProps = {
   titleStyle: {},
   size: 'normal',
   loadingProps: {},
+  icon: null, // Default to no icon
 };
 
 const styles = StyleSheet.create({
@@ -60,6 +64,9 @@ const styles = StyleSheet.create({
   titleSmall: {
     fontSize: sizes.h5,
     lineHeight: 17,
+  },
+  iconContainer: {
+    marginRight: 8, // Space between icon and text
   },
 });
 
