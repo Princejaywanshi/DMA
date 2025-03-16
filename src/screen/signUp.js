@@ -22,7 +22,7 @@ import ButtonWithPushBack from '../component/Button';
 import {color} from 'react-native-elements/dist/helpers';
 import PrimaryButton from '../component/prButton';
 import ActivityIndicator from '../assets/activityIndicator';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 
 const SignUp = () => {
@@ -38,9 +38,6 @@ const SignUp = () => {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [btnLoadingState, setBtnLoadingState] = useState(false);
   const navigation = useNavigation();
-  console.log(mobile)
-  console.log(password)
-  
 
   const validateInputs = () => {
     let newErrors = {};
@@ -92,48 +89,40 @@ const SignUp = () => {
 
   const handleSignUp = async () => {
     if (isButtonDisabled) return;
-  
+
     setBtnLoadingState(true); // Show loading indicator
-  
+
     try {
-      const response = await axios.post('http://52.70.194.52/api/account/register/', {
-        user_type: selectedProfile.toLowerCase(), // 'personal' or 'business'
-        username: username,
+      const response = await axios.post(
+        'http://52.70.194.52/api/account/register/',
+        {
+          user_type: selectedProfile.toLowerCase(), // 'personal' or 'business'
+          username: username,
+          email: email,
+          mobile_number: mobile,
+          password: password,
+        },
+      );
+
+      alert('Account created successfully!');
+
+      // ✅ Navigate only after successful signup & send all required
+
+      navigation.navigate('OTPVerificationScreen', {
+        user_type: selectedProfile.toLowerCase(),
         email: email,
         mobile_number: mobile,
+        username: username,
         password: password,
       });
-  
-      console.log('Sign-up successful!', response);
-      alert('Account created successfully!');
-  
-      // ✅ Navigate only after successful signup & send all required 
-      console.log("Navigating with data:", {
-        user_type: selectedProfile.toLowerCase(),
-        email: email,
-        mobile_number: mobile,
-        username: username,
-        password:password
-      });
-      navigation.navigate("OTPVerificationScreen", { 
-        user_type: selectedProfile.toLowerCase(),
-        email: email,
-        mobile_number: mobile,
-        username: username,
-        password:password
-      });
-  
     } catch (error) {
-      console.error('Sign-up failed:', error.response?.data || error.message);
-      alert(error.response?.data?.error || 'Registration failed. Please try again.');
+      alert(
+        error.response?.data?.error || 'Registration failed. Please try again.',
+      );
     } finally {
       setBtnLoadingState(false); // Hide loading indicator
     }
   };
-  
-  
-
-  
 
   return (
     <SafeAreaView
@@ -141,140 +130,139 @@ const SignUp = () => {
         styles.container,
         {...(Platform.OS == 'android' && TOP_SPACE_ANDROID)},
       ]}>
-             <KeyboardAvoidingView
+      <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{flex: 1}}>
-      <View style={{height: SCREEN_HEIGHT * 0.1, width: SCREEN_WIDTH}}>
-        <Avatar
-          rounded
-          size="large"
-          source={{uri: 'https://example.com/avatar.png'}}
-          containerStyle={styles.avatar}
-        />
-      </View>
-
-      <View
-        style={{
-          height: SCREEN_HEIGHT * 0.15,
-          width: SCREEN_WIDTH,
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}>
-        <Text h2 bold textAliments="center" style={styles.title}>
-          Create account
-        </Text>
-        <Text style={styles.subtitle}>PROFILE</Text>
-      </View>
-      <View style={styles.profileSelector}>
-        <TouchableOpacity
-          style={[
-            styles.profileButton,
-            selectedProfile === 'Personal' && styles.selectedButton,
-          ]}
-          onPress={() => setSelectedProfile('Personal')}>
-          <Text h5 style={styles.profileText}>
-            Personal
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.profileButton,
-            selectedProfile === 'Business' && styles.selectedButton,
-          ]}
-          onPress={() => setSelectedProfile('Business')}>
-          <Text style={styles.profileText}>Business</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={{bottom: 30}}>
-        <TextInputEml
-          label="Username"
-          placeholder="Enter your username"
-          value={username}
-          onChangeText={setUsername}
-          icon="user"
-        />
-        {errors.username && (
-          <Text h5 style={{color: theme.$danger2, bottom: 10}}>
-            {errors.username}
-          </Text>
-        )}
-        <TextInputEml
-          label="Email"
-          placeholder="Enter your email"
-          value={email}
-          onChangeText={setEmail}
-          icon="envelope"
-          keyboardType="email-address"
-        />
-        {errors.email && (
-          <Text h5 style={{color: theme.$danger2, bottom: 10}}>
-            {errors.email}
-          </Text>
-        )}
-        <TextInputEml
-          label="Mobile"
-          placeholder="Enter your mobile no"
-          value={mobile}
-          onChangeText={setMobile}
-          icon="phone"
-          keyboardType="phone-pad"
-        />
-        {errors.mobile && (
-          <Text h5 style={{color: theme.$danger2, bottom: 10}}>
-            {errors.mobile}
-          </Text>
-        )}
-        <TextInputEml
-          label="Password"
-          placeholder="********"
-          value={password}
-          onChangeText={setPassword}
-          icon="lock"
-          secureTextEntry={secureText}
-          rightIcon={secureText ? 'eye-slash' : 'eye'}
-          onRightIconPress={() => setSecureText(!secureText)}
-        />
-        {errors.password && (
-          <Text h5 style={{color: theme.$danger2, bottom: 10}}>
-            {errors.password}
-          </Text>
-        )}
-        <View style={styles.checkboxContainer}>
-          <Checkbox
-            checked={isChecked}
-            onPress={() => setIsChecked(!isChecked)}
+        <View style={{height: SCREEN_HEIGHT * 0.1, width: SCREEN_WIDTH}}>
+          <Avatar
+            rounded
+            size="large"
+            source={{uri: 'https://example.com/avatar.png'}}
+            containerStyle={styles.avatar}
           />
-          <Text style={styles.checkboxText}>Minimum 8 digits characters</Text>
         </View>
-      </View>
 
-
-      <PrimaryButton
-        disabled={isButtonDisabled}
-        title="Sign Up"
-        onPress={handleSignUp}
-        loading={btnLoadingState}
-        loadingProps={<ActivityIndicator  />}
-        style={isButtonDisabled ? {opacity: 0.5} : {}}
-      />
-
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          marginBottom: 30,
-        }}>
-        <Text h5 style={{color: theme.$surface}}>
-          Already have an Account?{' '}
-          <TouchableOpacity onPress={() =>navigation.navigate("Login")}>
-            <Text h5 style={{top: 8}}>
-              Login
+        <View
+          style={{
+            height: SCREEN_HEIGHT * 0.15,
+            width: SCREEN_WIDTH,
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+          <Text h2 bold textAliments="center" style={styles.title}>
+            Create account
+          </Text>
+          <Text style={styles.subtitle}>PROFILE</Text>
+        </View>
+        <View style={styles.profileSelector}>
+          <TouchableOpacity
+            style={[
+              styles.profileButton,
+              selectedProfile === 'Personal' && styles.selectedButton,
+            ]}
+            onPress={() => setSelectedProfile('Personal')}>
+            <Text h5 style={styles.profileText}>
+              Personal
             </Text>
           </TouchableOpacity>
-        </Text>
-      </View>
+          <TouchableOpacity
+            style={[
+              styles.profileButton,
+              selectedProfile === 'Business' && styles.selectedButton,
+            ]}
+            onPress={() => setSelectedProfile('Business')}>
+            <Text style={styles.profileText}>Business</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={{bottom: 30}}>
+          <TextInputEml
+            label="Username"
+            placeholder="Enter your username"
+            value={username}
+            onChangeText={setUsername}
+            icon="user"
+          />
+          {errors.username && (
+            <Text h5 style={{color: theme.$danger2, bottom: 10}}>
+              {errors.username}
+            </Text>
+          )}
+          <TextInputEml
+            label="Email"
+            placeholder="Enter your email"
+            value={email}
+            onChangeText={setEmail}
+            icon="envelope"
+            keyboardType="email-address"
+          />
+          {errors.email && (
+            <Text h5 style={{color: theme.$danger2, bottom: 10}}>
+              {errors.email}
+            </Text>
+          )}
+          <TextInputEml
+            label="Mobile"
+            placeholder="Enter your mobile no"
+            value={mobile}
+            onChangeText={setMobile}
+            icon="phone"
+            keyboardType="phone-pad"
+          />
+          {errors.mobile && (
+            <Text h5 style={{color: theme.$danger2, bottom: 10}}>
+              {errors.mobile}
+            </Text>
+          )}
+          <TextInputEml
+            label="Password"
+            placeholder="********"
+            value={password}
+            onChangeText={setPassword}
+            icon="lock"
+            secureTextEntry={secureText}
+            rightIcon={secureText ? 'eye-slash' : 'eye'}
+            onRightIconPress={() => setSecureText(!secureText)}
+          />
+          {errors.password && (
+            <Text h5 style={{color: theme.$danger2, bottom: 10}}>
+              {errors.password}
+            </Text>
+          )}
+          <View style={styles.checkboxContainer}>
+            <Checkbox
+              checked={isChecked}
+              onPress={() => setIsChecked(!isChecked)}
+            />
+            <Text style={styles.checkboxText}>Minimum 8 digits characters</Text>
+          </View>
+        </View>
+
+        <PrimaryButton
+          disabled={isButtonDisabled}
+          title="Sign Up"
+          onPress={handleSignUp}
+          loading={btnLoadingState}
+          loadingProps={<ActivityIndicator />}
+          style={isButtonDisabled ? {opacity: 0.5} : {}}
+        />
+
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            marginBottom: 30,
+          }}>
+          <Text h5 style={{color: theme.$surface}}>
+            Already have an Account?{' '}
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+              <Text h5 style={{top: 8}}>
+                Login
+              </Text>
+            </TouchableOpacity>
+          </Text>
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

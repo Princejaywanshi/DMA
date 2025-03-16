@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Alert,
@@ -7,37 +7,29 @@ import {
   TouchableOpacity,
   Platform,
 } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
+import {useRoute, useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import OTPTextView from '../component/otpInput';
 import PrimaryButton from '../component/prButton';
 import Text from '../component/Text';
 import useTheme from '../hooks/useTheme';
 import ActivityIndicator from '../assets/activityIndicator';
-import { SCREEN_HEIGHT, TOP_SPACE_ANDROID } from '../utils/dimensions';
+import {SCREEN_HEIGHT, TOP_SPACE_ANDROID} from '../utils/dimensions';
 import ButtonWithPushBack from '../component/Button';
+import AuthStorage from '../utils/authStorage';
 
 const CORRECT_OTP = '123456';
 
-const OTPVerificationScreen  = () => {
+const OTPVerificationScreen = () => {
   const [otp, setOtp] = useState('');
   const [btnLoadingState, setBtnLoadingState] = useState(false);
-  const { theme } = useTheme();
+  const {theme} = useTheme();
   const navigation = useNavigation();
   const route = useRoute();
-  // console.log("otp",otp)
 
-  const { email, password, mobile_number, username, user_type } = route.params ;
-  console.log("Received Data in OTP Screen:", {
-    email,
-    password,
-   mobile_number,
-    username,
-    user_type
-  });
-  
+  const {email, password, mobile_number, username, user_type} = route.params;
 
-  const handleOTPChange = (enteredOtp) => {
+  const handleOTPChange = enteredOtp => {
     setOtp(enteredOtp);
   };
 
@@ -51,25 +43,31 @@ const OTPVerificationScreen  = () => {
       const response = await axios.post(
         'http://52.70.194.52/api/account/verify-otp/',
         {
-          user_type: user_type, 
+          user_type: user_type,
           username: username,
           email: email,
           mobile_number: mobile_number,
           password: password,
           otp: otp,
-        }
+        },
       );
-      console.log("resss99999",response.data)
+
+      if (response?.data?.user && response?.data?.access) {
+        await AuthStorage.saveTokens(
+          response?.data?.access,
+          response?.data?.refresh,
+        );
+      }
       const userId = response.data?.user?.id;
-      console.log("userId",userId)
+
       setBtnLoadingState(false);
       Alert.alert('Success', 'OTP Verified Successfully!');
-      navigation.navigate('createProfile', {userId:userId})
+      navigation.navigate('createProfile', {userId: userId});
     } catch (error) {
       setBtnLoadingState(false);
       Alert.alert(
         'Error',
-        error.response?.data?.message || 'OTP verification failed'
+        error.response?.data?.message || 'OTP verification failed',
       );
     }
   };
@@ -79,10 +77,11 @@ const OTPVerificationScreen  = () => {
       style={[
         styles.container,
         Platform.OS === 'android' && TOP_SPACE_ANDROID,
-      ]}
-    >
+      ]}>
       <View style={styles.header}>
-        <Text h3 semiBold>Check your email</Text>
+        <Text h3 semiBold>
+          Check your email
+        </Text>
       </View>
 
       <View style={styles.otpContainer}>
@@ -95,32 +94,34 @@ const OTPVerificationScreen  = () => {
         />
       </View>
 
-      <ButtonWithPushBack customContainerStyle={{ marginVertical: 30 }}>
+      <ButtonWithPushBack customContainerStyle={{marginVertical: 30}}>
         <PrimaryButton
           disabled={otp.length !== 6 || btnLoadingState}
           title="Verify email"
           onPress={handleVerify}
           loading={btnLoadingState}
-          loadingProps={<ActivityIndicator  />}
-          style={{ opacity: otp.length !== 6 || btnLoadingState ? 0.5 : 1 }}
+          loadingProps={<ActivityIndicator />}
+          style={{opacity: otp.length !== 6 || btnLoadingState ? 0.5 : 1}}
         />
       </ButtonWithPushBack>
 
       <View style={styles.resendContainer}>
-        <Text h5 style={{ color: theme.$surface }}>
+        <Text h5 style={{color: theme.$surface}}>
           Didn't receive an email?{' '}
           <TouchableOpacity onPress={() => console.log('Resend OTP')}>
-            <Text h5 semiBold style={{ color: theme.$surface, top: 8 }}>
+            <Text h5 semiBold style={{color: theme.$surface, top: 8}}>
               Click to resend
             </Text>
           </TouchableOpacity>
         </Text>
       </View>
       <View style={styles.backToLogin}>
-  <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-    <Text h4 bold textAliments="center">Back to log in</Text>
-  </TouchableOpacity>
-</View>
+        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <Text h4 bold textAliments="center">
+            Back to log in
+          </Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };

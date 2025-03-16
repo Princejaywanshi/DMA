@@ -1,4 +1,3 @@
-;
 import {USER, baseUrl} from './endPoints';
 
-export {baseUrl, USER,};
+export {baseUrl, USER};

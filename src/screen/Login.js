@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   SafeAreaView,
+  Platform,
 } from 'react-native';
 import {Avatar, CheckBox, Icon} from 'react-native-elements';
 import {inputMinHeight} from '../utils/theme';
@@ -16,21 +17,20 @@ import {
   TOP_SPACE_ANDROID,
 } from '../utils/dimensions';
 import TextInputEml from '../component/textInput';
-import { color } from 'react-native-elements/dist/helpers';
+import {color} from 'react-native-elements/dist/helpers';
 import ButtonWithPushBack from '../component/Button';
 import PrimaryButton from '../component/prButton';
 import axios from 'axios';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { login } from '../network/action';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import {login} from '../network/action';
 import AuthStorage from '../utils/authStorage';
-import { useDispatch } from 'react-redux';
-import { setUserData } from '../slices/userSlice';
+import {useDispatch} from 'react-redux';
+import {setUserData} from '../slices/userSlice';
 import Text from '../component/Text';
-
 
 export default function Login() {
   const {theme} = useTheme();
-  const dispatch=useDispatch()
+  const dispatch = useDispatch();
   // const [emailOrPhone, setEmailOrPhone] = useState('');
   // const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -42,9 +42,6 @@ export default function Login() {
   const [emailOrPhone, setEmailOrPhone] = useState(route.params?.email || '');
   const [password, setPassword] = useState(route.params?.password || '');
 
-  console.log('Received in Login:', emailOrPhone, password);
-  
-
   // const validateEmailOrPhone = text => {
   //   setEmailOrPhone(text);
   //   setError(''); // Jaise hi user type kare, error hata do
@@ -52,23 +49,23 @@ export default function Login() {
 
   const inputRef = useRef(null);
 
-const validateEmailOrPhone = (text) => {
+  const validateEmailOrPhone = text => {
     setEmailOrPhone(text);
-    setError(''); 
+    setError('');
 
     // Focus input if there's an error
     if (!text) {
-        inputRef.current?.focus();
+      inputRef.current?.focus();
     }
-};
-useEffect(() => {
-  if (route.params?.email) {
-    setEmailOrPhone(route.params.email);
-  }
-  if (route.params?.password) {
-    setPassword(route.params.password);
-  }
-}, [route.params]); 
+  };
+  useEffect(() => {
+    if (route.params?.email) {
+      setEmailOrPhone(route.params.email);
+    }
+    if (route.params?.password) {
+      setPassword(route.params.password);
+    }
+  }, [route.params]);
 
   // const handleLogin = () => {
   //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -88,8 +85,6 @@ useEffect(() => {
   //   console.log('Password:', password);
   // };
 
-  
-
   // const handleLogin = () => {
   //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   //   const phoneRegex = /^[0-9]{10}$/; // Exactly 10 digits allowed
@@ -107,26 +102,25 @@ useEffect(() => {
   //   console.log('Email/Phone:', emailOrPhone);
   //   console.log('Password:', password);
   // };
-  
- 
+
   // const handleLogin = async () => {
   //   setError(''); // Reset error before making request
-    
+
   //   if (!emailOrPhone || !password) {
   //     setError('Email/Phone and Password are required');
   //     return;
   //   }
-  
+
   //   try {
   //     console.log('Sending login request with:', { username: emailOrPhone, password });
-  
+
   //     const response = await axios.post('http://52.70.194.52/api/account/login/', {
   //       username: emailOrPhone,
   //       password: password,
   //     });
-  
+
   //     console.log('Full Response:', response);
-      
+
   //     if (response.status === 200) {
   //       console.log('Login Successful:', response.data);
   //       navigation.navigate('createProfile');
@@ -136,7 +130,7 @@ useEffect(() => {
   //     }
   //   } catch (error) {
   //     console.log('Login Error:', error);
-      
+
   //     if (error.response) {
   //       console.log('Error Response:', error.response);
   //       setError(error.response.data?.message || 'Invalid email/phone or password.');
@@ -149,48 +143,41 @@ useEffect(() => {
   //     }
   //   }
   // };
-  
-  
-  
+
   const handleLogin = async () => {
     setError('');
-    
+
     if (!emailOrPhone || !password) {
       setError('Email/Phone and Password are required');
       return;
     }
-  
+
     try {
-      const response = await login({ username: emailOrPhone, password });
-  
-      console.log('Login Response:', response); // Debugging
-  
+      const response = await login({username: emailOrPhone, password});
+
       if (response?.user && response?.access) {
-        console.log('Access Token:', response.access); // Log the access token
-        console.log('Refresh Token:', response.refresh);
-        AuthStorage.saveTokens(response?.access,response?.refresh)
-        dispatch(setUserData(response?.user))
+        await AuthStorage.saveTokens(response?.access, response?.refresh);
+        dispatch(setUserData(response?.user));
         navigation.navigate('createProfile');
       } else {
         setError(response?.data?.message || 'Invalid credentials.');
       }
-    } catch (error) {
-      console.error('Login Error:', error); // Debugging
-      if (error.response) {
-        setError(error.response.data?.message || 'Invalid email/phone or password.');
+    } catch (err) {
+      if (err.response) {
+        setError(
+          err.response.data?.message || 'Invalid email/phone or password.',
+        );
       } else {
-        setError('Network error. Please check your connection.');
+        setError('Network err. Please check your connection.');
       }
     }
   };
-  
 
-  
   return (
     <SafeAreaView
       style={[
         styles.container,
-        {...(Platform.OS == 'android' && TOP_SPACE_ANDROID)},
+        {...(Platform.OS === 'android' && TOP_SPACE_ANDROID)},
       ]}>
       <View style={{height: SCREEN_HEIGHT * 0.15}}>
         <View style={styles.header}>
@@ -216,28 +203,27 @@ useEffect(() => {
               value={emailOrPhone}
               onChangeText={validateEmailOrPhone}
             /> */}
-               <TextInputEml
-                ref={inputRef}
-                label="Email or Phone"
-                placeholder="Email or Phone"
-                value={emailOrPhone}
-                onChangeText={validateEmailOrPhone}
-                // icon="lock"
-                // secureTextEntry={secureText}
-                // rightIcon={secureText ? 'eye-slash' : 'eye'}
-                // onRightIconPress={() => setSecureText(!secureText)}
-              />
+            <TextInputEml
+              ref={inputRef}
+              label="Email or Phone"
+              placeholder="Email or Phone"
+              value={emailOrPhone}
+              onChangeText={validateEmailOrPhone}
+              // icon="lock"
+              // secureTextEntry={secureText}
+              // rightIcon={secureText ? 'eye-slash' : 'eye'}
+              // onRightIconPress={() => setSecureText(!secureText)}
+            />
             {error ? (
-              <Text h5 style={{color:theme.$danger}}>
+              <Text h5 style={{color: theme.$danger}}>
                 {error}
               </Text>
             ) : null}
           </View>
           <View style={styles.inputGroup}>
             <View style={styles.passwordContainer}>
-
               <TextInputEml
-               ref={inputRef}
+                ref={inputRef}
                 label="Password"
                 placeholder="Password"
                 value={password}
@@ -249,34 +235,35 @@ useEffect(() => {
               />
             </View>
           </View>
-          <View style={[styles.rememberForgot, {width:"100%"}]}>
+          <View style={[styles.rememberForgot, {width: '100%'}]}>
             <CheckBox
               checked={rememberMe}
               onPress={() => setRememberMe(!rememberMe)}
               containerStyle={styles.checkbox}
             />
-            <Text h5 style={[styles.rememberForgotText,{color:theme.$surface}]}>
+            <Text
+              h5
+              style={[styles.rememberForgotText, {color: theme.$surface}]}>
               Remember for 30 days
             </Text>
             <TouchableOpacity>
-              <Text h5 style={{color:theme.$lightText}}>
+              <Text h5 style={{color: theme.$lightText}}>
                 Forgot password
               </Text>
             </TouchableOpacity>
           </View>
           {/* <Button title="Login" onPress={handleLogin} /> */}
-          <ButtonWithPushBack customContainerStyle={{marginVertical:30}}>
-            <PrimaryButton
-            title="Login" 
-            onPress={handleLogin} 
-            />
+          <ButtonWithPushBack customContainerStyle={{marginVertical: 30}}>
+            <PrimaryButton title="Login" onPress={handleLogin} />
           </ButtonWithPushBack>
         </View>
         <View style={styles.signupLink}>
-          <Text h5 semiBold style={{color:theme.$surface}}>
+          <Text h5 semiBold style={{color: theme.$surface}}>
             Don't have an account?{' '}
-            <TouchableOpacity onPress={()=>navigation.navigate("SignUp")}>
-            <Text h5 semiBold  style={{top:7}}>Sign Up</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+              <Text h5 semiBold style={{top: 7}}>
+                Sign Up
+              </Text>
             </TouchableOpacity>
           </Text>
         </View>
@@ -290,7 +277,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'black',
     paddingHorizontal: 14,
-
   },
   phoneContainer: {
     flex: 1,
@@ -329,10 +315,10 @@ const styles = StyleSheet.create({
   signupLink: {
     alignItems: 'center',
     // marginBottom: 50,
-    justifyContent:"flex-end",
-    flexGrow:1,
+    justifyContent: 'flex-end',
+    flexGrow: 1,
     // borderWidth:1,
     // borderColor:"white",
-    height:SCREEN_HEIGHT*0.3
+    height: SCREEN_HEIGHT * 0.3,
   },
 });
