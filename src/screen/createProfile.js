@@ -25,7 +25,7 @@ const createProfile = () => {
             <Custominput width="92%" title="Gender" marginTop={15} />
             <Custominput width="92%" title="Location" marginTop={15} />
             <Custominput height="13%" title="About You" marginTop={15} />
-            <ButtonWithPushBack customContainerStyle={{ marginVertical: 50,with:"50%" }}>
+            <ButtonWithPushBack customContainerStyle={{ marginVertical: 50, }}>
                 <PrimaryButton title="Create Profile" />
             </ButtonWithPushBack>
 

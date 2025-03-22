@@ -1,12 +1,14 @@
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
-import { Text, View } from "react-native";
+import ButtomTab from "../ButtomTab";
+const Stack = createNativeStackNavigator();
 
-const appStack=()=>{
-    return(
-        <View>
-            <Text>appStack</Text>
-        </View>
+const Appstack = () => {
+    return (
+        <Stack.Navigator screenOptions={({ headerShown: false })}>
+            <Stack.Screen name="ButtomTab" component={ButtomTab} />
+        </Stack.Navigator>
     )
 }
 
-export default appStack
+export default Appstack
