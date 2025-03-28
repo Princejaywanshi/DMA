@@ -25,8 +25,8 @@ const Text = (props) => {
     ...rest
   } = props;
 
-  const defaultColor = '#ffffff'; // Default color
-  const primaryColor = '#4f4f4f'; // Primary color
+  const defaultColor = "#000000"; // Default color
+  const primaryColor = '#FFFFFF'; // Primary color
 
   return (
     <RNText

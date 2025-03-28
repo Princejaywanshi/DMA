@@ -27,50 +27,77 @@ const OTPVerificationScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const {email, password, mobile_number, username, user_type} = route.params;
+  // const {email, password, mobile_number, username, user_type} = route.params;
 
   const handleOTPChange = enteredOtp => {
     setOtp(enteredOtp);
   };
 
-  const handleVerify = async () => {
-    if (otp.length !== 6) {
-      Alert.alert('Error', 'Please enter a 6-digit OTP');
-      return;
-    }
-    setBtnLoadingState(true);
-    try {
-      const response = await axios.post(
-        'http://52.70.194.52/api/account/verify-otp/',
-        {
-          user_type: user_type,
-          username: username,
-          email: email,
-          mobile_number: mobile_number,
-          password: password,
-          otp: otp,
-        },
-      );
+const handleVerify = async () => {
+  if (otp.length !== 6) {
+    Alert.alert('Error', 'Please enter a 6-digit OTP');
+    return;
+  }
 
-      if (response?.data?.user && response?.data?.access) {
-        await AuthStorage.saveTokens(
-          response?.data?.access,
-          response?.data?.refresh,
-        );
+  setBtnLoadingState(true);
+
+  console.log('Entered OTP:', otp);
+  console.log('Route Params:', route.params);
+
+  const { email, password, mobile_number, username, user_type } = route.params || {};
+
+  if (!email || !password || !mobile_number || !username || !user_type) {
+    Alert.alert('Error', 'Missing required user details. Please try again.');
+    console.log('Missing Params:', { email, password, mobile_number, username, user_type });
+    setBtnLoadingState(false);
+    return;
+  }
+
+  try {
+    const response = await axios.post(
+      'http://52.70.194.52/api/account/verify-otp/',
+      {
+        user_type,
+        username,
+        email,
+        mobile_number,
+        password,
+        otp,
       }
-      const userId = response.data?.user?.id;
+    );
 
+    console.log('API Response:', response);
+
+    if (response?.data?.user && response?.data?.access) {
+      await AuthStorage.saveTokens(response.data.access, response.data.refresh);
+
+      const userId = response.data.user.id;
       setBtnLoadingState(false);
-      Alert.alert('Success', 'OTP Verified Successfully!');
-      navigation.navigate('createProfile', {userId: userId});
-    } catch (error) {
-      setBtnLoadingState(false);
-      Alert.alert(
-        'Error',
-        error.response?.data?.message || 'OTP verification failed',
-      );
+
+      // ✅ Navigate only if tokens exist
+      // if (response.data.access && response.data.refresh) {
+      //   if (user_type.toLowerCase() === 'personal') {
+      //     navigation.navigate('createProfile', { userId });
+      //   } else {
+      //     navigation.navigate('BussinessProfile', { userId });
+      //   }
+      if(response){
+        navigation.navigate('createProfile', { userId });
+
+
+      } else {
+        Alert.alert('Error', 'Authentication failed. Please try again.');
+      }
+    } else {
+      throw new Error('Invalid response from server');
     }
-  };
+  } catch (error) {
+    setBtnLoadingState(false);
+    console.log('API Error:', error.response?.data || error.message);
+    Alert.alert('Error', error.response?.data?.message || 'OTP verification failed. Please try again.');
+  }
+};
+
 
   return (
     <SafeAreaView
@@ -88,8 +115,8 @@ const OTPVerificationScreen = () => {
         <OTPTextView
           inputCount={6}
           handleTextChange={handleOTPChange}
-          tintColor="#E847c5"
-          offTintColor="#E847c5"
+          tintColor="#FFFFFF"
+          offTintColor="grey"
           autoFocus={true}
         />
       </View>
@@ -131,7 +158,7 @@ export default OTPVerificationScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    // backgroundColor: '#000',
     paddingHorizontal: 16,
   },
   header: {

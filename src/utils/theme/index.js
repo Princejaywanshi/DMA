@@ -3,9 +3,9 @@ export const themes = {
     $mode: 'dark',
     // $primary: '#2B3B6F',
     // $accent: '#17A948',
-    // $background: '#121212',
+     $background: '#121212',
     // $headerBackground: '#202020',
-    $surface: '#4F4F4F',
+    $surface: '#F2F3F4',
     // $disabled: '#A1A7B6',
     $danger: '#f50b57',
     $danger2: '#DE3B40',
@@ -39,12 +39,12 @@ export const themes = {
     // $accent: '#17A948',
     // $background: '#fff',
     // $headerBackground: '#ffffff',
-    $surface: '#4F4F4F',
+    $surface: '#F2F3F4',
     $disabled: '#A1A7B6',
     $danger: '#C12126',
     $danger2: '#DE3B40',
     // $lightText: 'rgba(23, 26, 31, 0.34)',
-    $lightText: '#FFFFFF',
+    $lightText: '#000000',
     $lightBgGray:'#F3F4F6',
     $text: '#E5E5E5',
     $iconColor: '#E5E5E5',
@@ -66,7 +66,8 @@ export const themes = {
     $borderColor2:'#ededed',
     $lightBG2:'#f9f9f9',
     $thiredBG:'#f4f5ff',
-    $darkGreen:'#092B2D'
+    $darkGreen:'#092B2D',
+    
   },
 };
 export const iconSize = 35;

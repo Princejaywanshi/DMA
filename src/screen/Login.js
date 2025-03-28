@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Platform,
+  Image,
+  KeyboardAvoidingView,
 } from 'react-native';
 import {Avatar, CheckBox, Icon} from 'react-native-elements';
 import {inputMinHeight} from '../utils/theme';
@@ -27,6 +29,7 @@ import AuthStorage from '../utils/authStorage';
 import {useDispatch} from 'react-redux';
 import {setUserData} from '../slices/userSlice';
 import Text from '../component/Text';
+import { showMessage } from '../utils/messages/message';
 
 export default function Login() {
   const {theme} = useTheme();
@@ -41,6 +44,7 @@ export default function Login() {
   const route = useRoute();
   const [emailOrPhone, setEmailOrPhone] = useState(route.params?.email || '');
   const [password, setPassword] = useState(route.params?.password || '');
+
 
   // const validateEmailOrPhone = text => {
   //   setEmailOrPhone(text);
@@ -158,7 +162,14 @@ export default function Login() {
       if (response?.user && response?.access) {
         await AuthStorage.saveTokens(response?.access, response?.refresh);
         dispatch(setUserData(response?.user));
-        navigation.navigate('createProfile');
+
+        showMessage({
+          message: 'Login successful!',
+          type: 'success',
+          theme: theme, 
+          duration: 3000
+        });
+        navigation.navigate('HomeScreen');
       } else {
         setError(response?.data?.message || 'Invalid credentials.');
       }
@@ -175,150 +186,117 @@ export default function Login() {
 
   return (
     <SafeAreaView
-      style={[
-        styles.container,
-        {...(Platform.OS === 'android' && TOP_SPACE_ANDROID)},
-      ]}>
-      <View style={{height: SCREEN_HEIGHT * 0.15}}>
-        <View style={styles.header}>
-          <Avatar
-            rounded
-            size="large"
-            source={{uri: 'https://example.com/avatar.png'}}
-            containerStyle={styles.avatar}
-          />
-          <Text h2 semiBold>
-            Log in your account
-          </Text>
-        </View>
-        <View style={styles.content}>
-          <View style={styles.inputGroup}>
-            {/* <Text h5 style={styles.inputLabel}>
-              Email or Phone
-            </Text>
-            <TextInputEml
-              style={styles.input}
-              placeholder="Email or Phone"
-              placeholderTextColor={theme.$primary}
-              value={emailOrPhone}
-              onChangeText={validateEmailOrPhone}
-            /> */}
-            <TextInputEml
-              ref={inputRef}
-              label="Email or Phone"
-              placeholder="Email or Phone"
-              value={emailOrPhone}
-              onChangeText={validateEmailOrPhone}
-              // icon="lock"
-              // secureTextEntry={secureText}
-              // rightIcon={secureText ? 'eye-slash' : 'eye'}
-              // onRightIconPress={() => setSecureText(!secureText)}
-            />
-            {error ? (
-              <Text h5 style={{color: theme.$danger}}>
-                {error}
-              </Text>
-            ) : null}
-          </View>
-          <View style={styles.inputGroup}>
-            <View style={styles.passwordContainer}>
-              <TextInputEml
-                ref={inputRef}
-                label="Password"
-                placeholder="Password"
-                value={password}
-                onChangeText={setPassword}
-                // icon="lock"
-                secureTextEntry={secureText}
-                rightIcon={secureText ? 'eye-slash' : 'eye'}
-                onRightIconPress={() => setSecureText(!secureText)}
-              />
-            </View>
-          </View>
-          <View style={[styles.rememberForgot, {width: '100%'}]}>
-            <CheckBox
-              checked={rememberMe}
-              onPress={() => setRememberMe(!rememberMe)}
-              containerStyle={styles.checkbox}
-            />
-            <Text
-              h5
-              style={[styles.rememberForgotText, {color: theme.$surface}]}>
-              Remember for 30 days
-            </Text>
-            <TouchableOpacity>
-              <Text h5 style={{color: theme.$lightText}}>
-                Forgot password
-              </Text>
-            </TouchableOpacity>
-          </View>
-          {/* <Button title="Login" onPress={handleLogin} /> */}
-          <ButtonWithPushBack customContainerStyle={{marginVertical: 30}}>
-            <PrimaryButton title="Login" onPress={handleLogin} />
-          </ButtonWithPushBack>
-        </View>
-        <View style={styles.signupLink}>
-          <Text h5 semiBold style={{color: theme.$surface}}>
-            Don't have an account?{' '}
-            <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-              <Text h5 semiBold style={{top: 7}}>
-                Sign Up
-              </Text>
-            </TouchableOpacity>
-          </Text>
-        </View>
+    style={[
+      styles.container,
+      {...(Platform.OS === 'android' && TOP_SPACE_ANDROID)},
+    ]}
+  >
+        <KeyboardAvoidingView
+              behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
+              style={{flex: 1}}>
+    <View style={styles.wrapper}>
+      <View style={styles.header}>
+        <Image source={require("../assets/icon/profiles.png")} style={styles.image} />
       </View>
-    </SafeAreaView>
+      <View style={styles.content}>
+        <View style={styles.inputGroup}>
+          <TextInputEml
+            ref={inputRef}
+            label="Email or Phone"
+            placeholder="Email or Phone"
+            value={emailOrPhone}
+            onChangeText={validateEmailOrPhone}
+          />
+          {error ? (
+            <Text h5 style={{color: theme.$danger}}>{error}</Text>
+          ) : null}
+        </View>
+        <View style={styles.inputGroup}>
+          <TextInputEml
+            ref={inputRef}
+            label="Password"
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={secureText}
+            rightIcon={secureText ? 'eye-slash' : 'eye'}
+            onRightIconPress={() => setSecureText(!secureText)}
+          />
+        </View>
+        <View style={styles.rememberForgot}>
+          <CheckBox
+            checked={rememberMe}
+            onPress={() => setRememberMe(!rememberMe)}
+            containerStyle={styles.checkbox}
+          />
+          <Text h5 style={[styles.rememberForgotText, {color: theme.$lightText}]}>
+            Remember
+          </Text>
+          <TouchableOpacity>
+            <Text h5 style={{color: theme.$lightText}}>Forgot password</Text>
+          </TouchableOpacity>
+        </View>
+        <ButtonWithPushBack customContainerStyle={{marginVertical: 30}}>
+          <PrimaryButton title="Login" onPress={handleLogin} />
+        </ButtonWithPushBack>
+      </View>
+      <View style={styles.signupLink}>
+        <Text h5 semiBold>
+          Don't have an account?{' '}
+          <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+            <Text h5 semiBold style={{top: 7}}>Sign Up</Text>
+          </TouchableOpacity>
+        </Text>
+      </View>
+    </View>
+    </KeyboardAvoidingView>
+  </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'black',
+    backgroundColor: '#ffffff',
     paddingHorizontal: 14,
   },
-  phoneContainer: {
-    flex: 1,
+  wrapper: {
+    flex: 1, 
+    justifyContent: 'center', // Center vertically
+    alignItems: 'center', // Center horizontally
   },
   header: {
-    padding: 20,
-    // alignItems: 'center',
-    // marginTop:40
+    alignItems: 'center',
+    marginBottom: 20, 
   },
-  avatar: {
-    marginBottom: 20,
-    // borderWidth: 2,
-    borderColor: 'white',
+  image: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
   },
   content: {
+    width: '100%', // Full width for form
     paddingHorizontal: 20,
   },
   inputGroup: {
-    marginBottom: 20,
+    marginBottom: 1,
   },
   rememberForgot: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 20,
   },
   checkbox: {
     backgroundColor: 'transparent',
     borderWidth: 0,
     padding: 0,
-    right: 5,
   },
   rememberForgotText: {
-    right: 25,
+    right: 50,
   },
   signupLink: {
-    alignItems: 'center',
-    // marginBottom: 50,
-    justifyContent: 'flex-end',
-    flexGrow: 1,
-    // borderWidth:1,
-    // borderColor:"white",
-    height: SCREEN_HEIGHT * 0.3,
+    position: 'absolute',
+    bottom: 20, // Adjust spacing from bottom
+    alignSelf: 'center',
   },
 });

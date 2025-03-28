@@ -26,9 +26,14 @@ import Text from '../component/Text';
 import Slide from '../assets/slide';
 import PrimaryButton from '../component/prButton';
 import { openCamera, openPhotos } from '../utils/imagePicker';
+import { useRoute } from '@react-navigation/native';
+import AuthStorage from '../utils/authStorage';
+import Header from '../component/header';
 
 export default function BussinessProfile({navigation}) {
   const {theme} = useTheme();
+    const route = useRoute();
+    const { userId } = route.params || {};
   const [profilePic, setProfilePic] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const [businessType, setBussinessType] = useState('');
@@ -39,6 +44,7 @@ export default function BussinessProfile({navigation}) {
   const [businessEmail, setBusinessEmail] = useState('');
   const [websiteLink, setWebsiteLink] = useState('');
   const [step, setStep] = useState(0);
+  const[mobileNumber,setMobileNumber]=useState("")
 
 
   const list = [
@@ -93,13 +99,68 @@ export default function BussinessProfile({navigation}) {
     }
   };
 
+  const handleCreateProfile = async () => {
+    const formData = new FormData();
+    formData.append('user', userId);
+    formData.append('business_type', businessType);
+    formData.append('business_owner', ownerName);
+    formData.append('business_name', bussinessName);
+    formData.append('business_about', aboutBusiness);
+    formData.append('business_address', businessLocation);
+    formData.append('business_phone', mobileNumber);
+    formData.append('business_website', websiteLink);
+    formData.append('business_email', businessEmail);
+  
+    if (profilePic) {
+      formData.append('business_logo', {
+        uri: profilePic,
+        type: 'image/jpeg',
+        name: 'business_logo.jpg',
+      });
+    }
+  
+    try {
+       const accessToken = await AuthStorage.getAccessToken();
+      // const accessToken="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQyNzEzMjg5LCJpYXQiOjE3NDIxMDg0ODksImp0aSI6IjhhNzJmMzIwMmNlMjQxN2M4MTZhMzdmZTQ4M2Q3M2E1IiwidXNlcl9pZCI6IjJjZDJiYjViLTU1NzAtNDk3My04YjMzLWQ4Yzc1YTY2MjEzNSJ9.IsmmJBg4NrBFdmdZ6oehtotLMIIkrcdhe6-chI4wLbo"
+      console.log("Access Token:", accessToken);
+      console.log("FormData:", formData);
+  
+      const response = await fetch('http://52.70.194.52/api/core/business-info/', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'multipart/form-data',
+        },
+        body: formData,
+      });
+  
+      console.log("Response Status:", response.status); // ✅ Console the status
+  
+      if (response.status === 201 || response.status === 200) {
+        const responseData = await response.json();
+        console.log('Profile Created:', responseData);
+        alert('Business Profile Created Successfully');
+        navigation.goBack();
+      } else {
+        const errorData = await response.json();
+        console.log('Error Response:', errorData);
+        alert(`Failed to create business profile: ${errorData.message || 'Please try again.'}`);
+      }
+    } catch (error) {
+      console.error('API Error:', error);
+      alert('Something went wrong! Please check your connection.');
+    }
+  };
+  
   return (
     <SafeAreaView style={styles.Container}>
-      <GestureHandlerRootView style={{flex: 1}}>
-      <Custombackbtn onPress={() => (step > 0 ? setStep(step - 1) : navigation.goBack())} />
-
+      {/* <GestureHandlerRootView style={{flex: 1}}> */}
+      {/* <Custombackbtn onPress={() => (step > 0 ? setStep(step - 1) : navigation.goBack())} /> */}
+      <Header showBack={true}    customBackEvent={() =>
+              (step > 0 ? setStep(step - 1) : navigation.goBack())
+            } />
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
           style={{flex: 1}}>
             <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
       {step === 0 && (
@@ -121,8 +182,8 @@ export default function BussinessProfile({navigation}) {
           </View>
 
           <View style={{ marginTop: hp('2%') }}>
-            <Text h4 semiBold>Business Type</Text>
-            <SingleSelect
+            {/* <Text h4 semiBold>Business Type</Text> */}
+            {/* <SingleSelect
               arrayData={[
                 { key: 'S', value: 'Sole Proprietorship' },
                 { key: 'P', value: 'Partnership' },
@@ -132,24 +193,23 @@ export default function BussinessProfile({navigation}) {
               uniqueId="businessType"
               selected={businessType}
               selectedCb={(key, val) => setBussinessType(val.value)}
-            />
+            /> */}
+             <Custominput title="BusinessType" value={businessType} onValueChange={setBussinessType} />
           </View>
 
           <View style={styles.ColRow}>
             <Custominput title="Business Owner" value={ownerName} onValueChange={setOwnerName} />
           </View>
 
-          <View style={{ marginTop: hp('3%') }}>
-            <Custominput title="Business Name" value={bussinessName} onValueChange={setBussinessName} />
-          </View>
+        
 
-          <Custominput
+          {/* <Custominput
             height="13%"
             title="About Business"
             marginTop={15}
             onValueChange={setAboutBussiness}
             multiline={true}
-          />
+          /> */}
 
           <ButtonWithPushBack customContainerStyle={styles.buttonContainer}>
             <PrimaryButton
@@ -165,11 +225,14 @@ export default function BussinessProfile({navigation}) {
       {step === 1 && (
         <Slide index={1}>
           <View style={styles.stepContainer}>
+          <View style={{ marginTop: hp('3%') }}>
+            <Custominput title="Business Name" value={bussinessName} onValueChange={setBussinessName} />
+          </View>
             <View style={{marginTop: hp('3%'),}}>
             <Custominput title="Business Location" value={businessLocation} onValueChange={setBusinessLocation} />
             </View>
             <View style={{marginTop: hp('3%'),}}>
-            <Custominput title="Mobile Number" value={businessEmail} onValueChange={setBusinessEmail} keyboardType="email-address" />
+            <Custominput title="Mobile Number" value={mobileNumber} onValueChange={setMobileNumber} keyboardType="email-address" />
             </View>
             <View style={{marginTop: hp('3%'),}}>
             <Custominput title="Website Link" value={websiteLink} onValueChange={setWebsiteLink} />
@@ -179,8 +242,8 @@ export default function BussinessProfile({navigation}) {
             </View>
 
           
-        <ButtonWithPushBack customContainerStyle={{ marginVertical: 100 }}>
-          <PrimaryButton title="Create Profile" onPress={""} />
+        <ButtonWithPushBack customContainerStyle={{ marginTop:50 }}>
+          <PrimaryButton title="Create Profile" onPress={handleCreateProfile} />
         </ButtonWithPushBack>
           </View>
         </Slide>
@@ -209,7 +272,7 @@ export default function BussinessProfile({navigation}) {
             ))}
           </BottomSheet>
         </View>
-      </GestureHandlerRootView>
+      {/* </GestureHandlerRootView> */}
     </SafeAreaView>
   );
 }
@@ -217,7 +280,7 @@ export default function BussinessProfile({navigation}) {
 const styles = StyleSheet.create({
   Container: {
     flex: 1,
-    backgroundColor: 'black',
+    backgroundColor: '#ffffff',
     paddingHorizontal: wp('4%'),
     paddingTop: hp('2%'),
   },
@@ -255,7 +318,7 @@ const styles = StyleSheet.create({
     // borderWidth:1,
     // flex:1
     justifyContent:"center",
-    paddingTop: hp('13%'),
+    paddingTop: hp('5%'),
     //  flex:1
   },
 });

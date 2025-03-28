@@ -9,10 +9,10 @@ import Animated, {
 import { SCREEN_WIDTH } from '../utils/dimensions';
 
 
-const DELAY = 400;
+const DELAY = 200;
 
 const timingConfig = {
-  duration: 800,
+  duration: 400,
   easing: Easing.inOut(Easing.cubic),
 };
 

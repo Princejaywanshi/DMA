@@ -5,6 +5,7 @@ export const USER = {
   LOGIN: 'account/login/',
   CORE_PERSONAL: 'core/personal-info/',
 };
+
 //   console.log("hhhhh",USER.LOGIN)
 // const fullApiUrl = `${baseUrl}${USER.LOGIN}`;
 // console.log('Full API URL:', fullApiUrl);

@@ -40,16 +40,17 @@ const styles = StyleSheet.create({
     title: {
         marginLeft: 5,
         marginBottom: 5,
-        color: "#ffffff",
+        color: "#000000",
     },
     colinput: {
         width: wp("100%"),
         height: hp("7%"),
         borderWidth: 1,
-        borderRadius: 5,
+        borderRadius: 10,
         paddingHorizontal: 10,
-        borderColor: "#ffffff",
-        color: "#ffffff",
-        backgroundColor: "#4f4f4f",
+        borderColor: "#000000",
+        color: "#000000",
+        backgroundColor: "#F2F3F4",
+        // elevation:2
     },
 });

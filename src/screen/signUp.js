@@ -24,6 +24,12 @@ import PrimaryButton from '../component/prButton';
 import ActivityIndicator from '../assets/activityIndicator';
 import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
+import Slide from '../assets/slide';
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen';
+import { useSelector } from 'react-redux';
 
 const SignUp = () => {
   const {theme} = useTheme();
@@ -38,6 +44,9 @@ const SignUp = () => {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [btnLoadingState, setBtnLoadingState] = useState(false);
   const navigation = useNavigation();
+  const [step, setStep] = useState(0);
+  const userData = useSelector(state => state.user.userData);
+  // console.log("userData",userData)
 
   const validateInputs = () => {
     let newErrors = {};
@@ -96,7 +105,7 @@ const SignUp = () => {
       const response = await axios.post(
         'http://52.70.194.52/api/account/register/',
         {
-          user_type: selectedProfile.toLowerCase(), // 'personal' or 'business'
+          user_type: selectedProfile, // 'personal' or 'business'
           username: username,
           email: email,
           mobile_number: mobile,
@@ -109,7 +118,7 @@ const SignUp = () => {
       // ✅ Navigate only after successful signup & send all required
 
       navigation.navigate('OTPVerificationScreen', {
-        user_type: selectedProfile.toLowerCase(),
+        user_type: selectedProfile,
         email: email,
         mobile_number: mobile,
         username: username,
@@ -130,150 +139,189 @@ const SignUp = () => {
         styles.container,
         {...(Platform.OS == 'android' && TOP_SPACE_ANDROID)},
       ]}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={{flex: 1}}>
-        <View style={{height: SCREEN_HEIGHT * 0.1, width: SCREEN_WIDTH}}>
-          <Avatar
-            rounded
-            size="large"
-            source={{uri: 'https://example.com/avatar.png'}}
-            containerStyle={styles.avatar}
-          />
-        </View>
-
+      {step === 0 && (
         <View
           style={{
-            height: SCREEN_HEIGHT * 0.15,
-            width: SCREEN_WIDTH,
             alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
-          <Text h2 bold textAliments="center" style={styles.title}>
-            Create account
-          </Text>
-          <Text style={styles.subtitle}>PROFILE</Text>
-        </View>
-        <View style={styles.profileSelector}>
-          <TouchableOpacity
-            style={[
-              styles.profileButton,
-              selectedProfile === 'Personal' && styles.selectedButton,
-            ]}
-            onPress={() => setSelectedProfile('Personal')}>
-            <Text h5 style={styles.profileText}>
-              Personal
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.profileButton,
-              selectedProfile === 'Business' && styles.selectedButton,
-            ]}
-            onPress={() => setSelectedProfile('Business')}>
-            <Text style={styles.profileText}>Business</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={{bottom: 30}}>
-          <TextInputEml
-            label="Username"
-            placeholder="Enter your username"
-            value={username}
-            onChangeText={setUsername}
-            icon="user"
-          />
-          {errors.username && (
-            <Text h5 style={{color: theme.$danger2, bottom: 10}}>
-              {errors.username}
-            </Text>
-          )}
-          <TextInputEml
-            label="Email"
-            placeholder="Enter your email"
-            value={email}
-            onChangeText={setEmail}
-            icon="envelope"
-            keyboardType="email-address"
-          />
-          {errors.email && (
-            <Text h5 style={{color: theme.$danger2, bottom: 10}}>
-              {errors.email}
-            </Text>
-          )}
-          <TextInputEml
-            label="Mobile"
-            placeholder="Enter your mobile no"
-            value={mobile}
-            onChangeText={setMobile}
-            icon="phone"
-            keyboardType="phone-pad"
-          />
-          {errors.mobile && (
-            <Text h5 style={{color: theme.$danger2, bottom: 10}}>
-              {errors.mobile}
-            </Text>
-          )}
-          <TextInputEml
-            label="Password"
-            placeholder="********"
-            value={password}
-            onChangeText={setPassword}
-            icon="lock"
-            secureTextEntry={secureText}
-            rightIcon={secureText ? 'eye-slash' : 'eye'}
-            onRightIconPress={() => setSecureText(!secureText)}
-          />
-          {errors.password && (
-            <Text h5 style={{color: theme.$danger2, bottom: 10}}>
-              {errors.password}
-            </Text>
-          )}
-          <View style={styles.checkboxContainer}>
-            <Checkbox
-              checked={isChecked}
-              onPress={() => setIsChecked(!isChecked)}
-            />
-            <Text style={styles.checkboxText}>Minimum 8 digits characters</Text>
-          </View>
-        </View>
-
-        <PrimaryButton
-          disabled={isButtonDisabled}
-          title="Sign Up"
-          onPress={handleSignUp}
-          loading={btnLoadingState}
-          loadingProps={<ActivityIndicator />}
-          style={isButtonDisabled ? {opacity: 0.5} : {}}
-        />
-
-        <View
-          style={{
+            justifyContent: 'center',
+            height: SCREEN_HEIGHT * 0.4,
             flex: 1,
-            justifyContent: 'flex-end',
-            alignItems: 'center',
-            marginBottom: 30,
           }}>
-          <Text h5 style={{color: theme.$surface}}>
-            Already have an Account?{' '}
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-              <Text h5 style={{top: 8}}>
-                Login
+          <Avatar
+            size={wp('20%')}
+            rounded
+            overlayContainerStyle={{
+              backgroundColor: 'black',
+              borderColor: theme.$secondaryText,
+              borderWidth: 1,
+            }}
+            icon={{
+              name: 'user',
+              type: 'font-awesome',
+              color: 'white',
+              size: 60,
+            }}
+          />
+          <Text h5 textAliments="center" style={{color: theme.$surgace}}>
+            Please select your profile type
+          </Text>
+          <View style={styles.profileSelector}>
+            <TouchableOpacity
+              style={[
+                styles.profileButton,
+                selectedProfile === 'Personal' && styles.selectedButton,
+              ]}
+              onPress={() => {
+                setSelectedProfile('Personal');
+                setStep(1);
+              }}>
+              <Text h5 style={styles.profileText}>
+                Personal
               </Text>
             </TouchableOpacity>
-          </Text>
+            <TouchableOpacity
+              style={[
+                styles.profileButton,
+                selectedProfile === 'Business' && styles.selectedButton,
+              ]}
+              onPress={() => {
+                setSelectedProfile('Business');
+                setStep(1);
+              }}>
+              <Text h5 style={styles.profileText}>
+                Business
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </KeyboardAvoidingView>
+      )}
+
+      {step === 1 && (
+        <Slide index={1}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' :"padding"}
+            style={{flex: 1}}
+            >
+            <View
+              style={[
+                // styles.container,
+                {...(Platform.OS == 'android' && TOP_SPACE_ANDROID)},
+              ]}>
+              <Text
+                h2
+                semiBold
+                textAliments="center"
+                style={{color: theme.$surface}}>
+                Create account
+              </Text>
+            </View>
+            <View
+              style={{
+                justifyContent: 'center',
+                paddingHorizontal: 16,
+                flex: 1,
+                marginBottom: 30,
+              }}>
+              <TextInputEml
+                label="Username"
+                placeholder="Enter your username"
+                value={username}
+                onChangeText={setUsername}
+                icon="user"
+              />
+              {errors.username && (
+                <Text h5 style={styles.errorText}>
+                  {errors.username}
+                </Text>
+              )}
+
+              <TextInputEml
+                label="Email"
+                placeholder="Enter your email"
+                value={email}
+                onChangeText={setEmail}
+                icon="envelope"
+                keyboardType="email-address"
+              />
+              {errors.email && (
+                <Text h5 style={styles.errorText}>
+                  {errors.email}
+                </Text>
+              )}
+
+              <TextInputEml
+                label="Mobile"
+                placeholder="Enter your mobile no"
+                value={mobile}
+                onChangeText={setMobile}
+                icon="phone"
+                keyboardType="phone-pad"
+              />
+              {errors.mobile && (
+                <Text h5 style={styles.errorText}>
+                  {errors.mobile}
+                </Text>
+              )}
+
+              <TextInputEml
+                label="Password"
+                placeholder="********"
+                value={password}
+                onChangeText={setPassword}
+                icon="lock"
+                secureTextEntry={secureText}
+                rightIcon={secureText ? 'eye-slash' : 'eye'}
+                onRightIconPress={() => setSecureText(!secureText)}
+              />
+              {errors.password && (
+                <Text h5 style={styles.errorText}>
+                  {errors.password}
+                </Text>
+              )}
+
+              <View style={styles.checkboxContainer}>
+                <Checkbox
+                  checked={isChecked}
+                  onPress={() => setIsChecked(!isChecked)}
+                />
+                <Text style={{color: theme.$surface}}>
+                  Minimum 5 characters required
+                </Text>
+              </View>
+            </View>
+            <ButtonWithPushBack
+              customContainerStyle={{marginBottom: 40, paddingHorizontal: 16}}>
+              <PrimaryButton
+                disabled={isButtonDisabled}
+                title="Sign Up"
+                onPress={handleSignUp}
+                loading={btnLoadingState}
+                loadingProps={<ActivityIndicator />}
+                style={isButtonDisabled ? {opacity: 0.5} : {}}
+              />
+            </ButtonWithPushBack>
+            <View style={styles.footer}>
+              <Text h5 textAliments="center">
+                Already have an Account?{' '}
+              </Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                <Text h5 textAliments="center" style={styles.loginText}>
+                  Login
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </KeyboardAvoidingView>
+        </Slide>
+      )}
     </SafeAreaView>
   );
 };
-
 export default SignUp;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    // backgroundColor: '#FFFFFF',
     paddingHorizontal: 16,
   },
   title: {
@@ -287,23 +335,23 @@ const styles = StyleSheet.create({
     bottom: 50,
   },
   profileSelector: {
-    flexDirection: 'row',
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 40,
     justifyContent: 'center',
-    bottom: 50,
   },
   profileButton: {
+    width: '100%',
     borderWidth: 2,
-    borderColor: '#E847C5',
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    marginHorizontal: 10,
-    backgroundColor: '#383333',
-    height: 40,
-    width: '30%',
+    // borderColor: '#E847C5',
+    paddingVertical: 10,
+    borderRadius: 10,
+    marginVertical: 10,
+    backgroundColor: 'black',
+    alignItems: 'center',
   },
   selectedButton: {
-    backgroundColor: '#f00',
+    backgroundColor: 'black',
   },
   profileText: {
     color: '#fff',
@@ -312,12 +360,20 @@ const styles = StyleSheet.create({
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 10,
+    // marginTop: 10,
   },
   checkboxText: {
-    color: '#fff',
+    color: 'grey',
     marginLeft: 10,
     fontSize: 14,
   },
-  errorText: {},
+  errorText: {
+    color: 'red',
+    bottom: 10,
+  },
+  footer: {
+    justifyContent: 'center',
+    flexDirection: 'row',
+    bottom: 30,
+  },
 });

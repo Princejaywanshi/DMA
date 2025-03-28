@@ -35,7 +35,7 @@ export default TextInputEml;
 
 const styles = StyleSheet.create({
     container: {
-        marginBottom: 15,
+        marginBottom: 10,
     },
     label: {
         marginBottom: 5,
@@ -48,14 +48,14 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         borderWidth: 1,
         // borderColor: "#E5E5E5",
-        height: 40, // ✅ Fixed height
+        height: 45, // ✅ Fixed height
     },
     icon: {
         marginRight: 8,
     },
     input: {
         flex: 1,
-        color: '#fff',
+        color: '#black',
         fontSize: 14,
     },
 });
